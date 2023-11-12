@@ -70,14 +70,39 @@ def remove_stock(product_id, stock_id, amount):
 
 def create_transaction(product_id, stock_id, amount, transaction_type):
     print("Creation de la transaction")
-    Database.execute_query(
-        'INSERT INTO transactions (id_product, id_stock, quantity, transaction_type) VALUES (%s, %s, %s, %s)',
-        (product_id, stock_id, amount, transaction_type),
-        commit=True
-    )
+    try:
+        connection = Database.get_connection()
+        with connection.cursor() as cursor:
+            cursor.execute("BEGIN;")
+
+            if transaction_type == 'INCOMING':
+                cursor.execute(
+                    'UPDATE stock_products SET quantity = quantity + %s WHERE id_product = %s AND id_stock = %s',
+                    (amount, product_id, stock_id)
+                )
+            elif transaction_type == 'OUTGOING':
+                cursor.execute(
+                    'UPDATE stock_products SET quantity = quantity - %s WHERE id_product = %s AND id_stock = %s AND quantity >= %s',
+                    (amount, product_id, stock_id, amount)
+                )
+                if cursor.rowcount == 0:
+                    raise Exception("Pas assez de stock pour la transaction OUTGOING.")
+
+            cursor.execute(
+                'INSERT INTO transactions (id_product, id_stock, quantity, transaction_type) VALUES (%s, %s, %s, %s)',
+                (product_id, stock_id, amount, transaction_type)
+            )
+
+            connection.commit()
+    except Exception as e:
+        print(f"Erreur lors de la creation de la transaction : {e}")
+        if connection:
+            connection.rollback()
+    finally:
+        Database.return_connection(connection)
 
 def main():
-    Database.initialise(user='postgres', password='test', database='Cours1', host='localhost')
+    Database.initialise(user='postgres', password='', database='bdd_tp_note', host='localhost')
 
     quit_program_flag = False
 
