@@ -29,7 +29,7 @@ ALTER TABLE stock_products ADD CONSTRAINT chk_quantity_nonnegative CHECK (quanti
 
 CREATE TABLE transactions
 (
-    id int PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     id_product int NOT NULL REFERENCES products(id),
     id_stock int NOT NULL REFERENCES stocks(id),
     quantity int NOT NULL,
