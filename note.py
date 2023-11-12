@@ -13,7 +13,11 @@ class Database:
 
     @staticmethod
     def get_connection():
-        return Database._connection_pool.getconn()
+        try:
+            return Database._connection_pool.getconn()
+        except Exception as e:
+            print(f"Erreur lors de la récupération de la connexion: {e}")
+            return None
 
     @staticmethod
     def return_connection(connection):
@@ -45,12 +49,15 @@ class Database:
             Database.return_connection(connection)
 
 def add_stock(product_id, stock_id, amount):
-    print("Ajout de stock")
-    Database.execute_query(
-        'UPDATE stock_products SET quantity = quantity + %s WHERE id_product = %s AND id_stock = %s',
-        (amount, product_id, stock_id),
-        commit=True
-    )
+    try:
+        print("Ajout de stock")
+        Database.execute_query(
+            'UPDATE stock_products SET quantity = quantity + %s WHERE id_product = %s AND id_stock = %s',
+            (amount, product_id, stock_id),
+            commit=True
+        )
+    except Exception as e:
+        print(f"Erreur lors de l'ajout de stock: {e}")
 
 def remove_stock(product_id, stock_id, amount):
     print("Retrait de stock")
@@ -101,6 +108,37 @@ def create_transaction(product_id, stock_id, amount, transaction_type):
     finally:
         Database.return_connection(connection)
 
+
+def validate_input(input_str, expected_type):
+    try:
+        return expected_type(input_str)
+    except ValueError:
+        print(f"Erreur: Entrée invalide. Attendu {expected_type.__name__}")
+        return None
+
+def transaction_command():
+    product_id = validate_input(input("Entrer l'id de produit: "), int)
+    stock_id = validate_input(input("Entrer l'id de stock: "), int)
+    amount = validate_input(input("Entrer la quantité: "), int)
+    transaction_type = input("Entrer le type de transaction (INCOMING/OUTGOING): ").upper()
+
+    if product_id is not None and stock_id is not None and amount is not None:
+        create_transaction(product_id, stock_id, amount, transaction_type)
+    else:
+        print("Transaction annulée en raison d'une entrée invalide.")
+
+def display_stock_products_command():
+    stock_id = validate_input(input("Entrer l'id de stock: "), int, "id de stock")
+    if stock_id is not None:
+        print("Liste des produits disponibles dans le stock demandé:\n",
+              Database.execute_query(
+                  'SELECT products.id, products.name, stock_products.quantity FROM products INNER JOIN stock_products ON products.id = stock_products.id_product WHERE stock_products.id_stock = %s',
+                  (stock_id,)
+              ))
+    else:
+        print("Commande annulée en raison d'une entrée invalide.")
+
+
 def main():
     Database.initialise(user='postgres', password='', database='bdd_tp_note', host='localhost')
 
@@ -123,17 +161,8 @@ def main():
         'h': display_help,
         's': lambda: print("Liste des stocks:\n", Database.execute_query('SELECT * FROM stocks')),
         'p': lambda: print("Liste des produits:\n", Database.execute_query('SELECT * FROM products')),
-        'sp': lambda: print("Liste des produits disponibles dans le stock demandé:\n",
-                        Database.execute_query(
-                            'SELECT products.id, products.name, stock_products.quantity FROM products INNER JOIN stock_products ON products.id = stock_products.id_product WHERE stock_products.id_stock = %s',
-                            (input("Entrer l'id de stock: "),)
-                        )),
-        't': lambda: create_transaction(
-            input("Entrer l'id de produit: "),
-            input("Entrer l'id de stock: "),
-            input("Entrer la quantité: "),
-            input("Entrer le type de transaction (INCOMING/OUTGOING): ")
-        ),
+        'sp': display_stock_products_command,
+        't': transaction_command,
         'q': lambda: quit_program()
     }
 
