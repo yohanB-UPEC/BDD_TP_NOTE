@@ -1,3 +1,8 @@
+## Auteurs :
+- Tom Dejardin
+- Yohan Bordes
+- Florian Queudot
+
 # Rapport d'Audit et de Sécurité pour le Système de Gestion des Stocks et Transactions
 
 ## Analyse de l'Audit

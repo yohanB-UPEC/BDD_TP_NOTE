@@ -1,4 +1,9 @@
-## Documentation Technique pour le Système de Gestion des Stocks et Transactions
+## Auteurs :
+- Tom Dejardin
+- Yohan Bordes
+- Florian Queudot
+
+# Documentation Technique pour le Système de Gestion des Stocks et Transactions
 
 ### Description Générale
 

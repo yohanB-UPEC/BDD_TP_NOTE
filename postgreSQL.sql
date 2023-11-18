@@ -25,7 +25,6 @@ CREATE TABLE stock_products
     quantity int NOT NULL DEFAULT 0 CHECK (quantity >= 0),
     PRIMARY KEY (id_stock, id_product)
 );
-ALTER TABLE stock_products ADD CONSTRAINT chk_quantity_nonnegative CHECK (quantity >= 0);
 
 CREATE TABLE transactions
 (

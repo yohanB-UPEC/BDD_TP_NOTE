@@ -1,3 +1,8 @@
+## Auteurs :
+- Tom Dejardin
+- Yohan Bordes
+- Florian Queudot
+
 # Rapport de Réflexion sur le Projet de Gestion des Stocks et Transactions
 
 ## Introduction
