@@ -1,13 +1,7 @@
 import { hot } from 'react-hot-loader';
 import React, { useEffect, useState } from 'react';
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
 import './App.css';
-import { Autocomplete, CircularProgress, TextField } from '@mui/material';
-
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { Autocomplete, CircularProgress, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, AppBar, Box, Toolbar, Typography } from '@mui/material';
 
 const useJoueurs = () => {
   const [etat, setEtat] = useState({
