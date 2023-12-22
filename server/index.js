@@ -6,7 +6,7 @@ const app = express();
 app.use(express.json());
 
 app.use(cors({
-    origin: ["http://localhost:5000", "http://localhost:3000"],
+    origin: ["http://localhost:5000", "http://localhost:3000", "http://127.0.0.1:5000", "http://127.0.0.1:5000/"],
     credentials: true,
 }));
 
@@ -80,14 +80,14 @@ app.post('/joueurs', async (req, res) => {
 
 app.delete('/joueurs/:joueur_id', async (req, res) => {
     const { joueur_id } = req.params;
-  
+
     try {
         const deleteResult = await pool.query('DELETE FROM joueurs WHERE joueur_id = $1 RETURNING *', [joueur_id]);
-    
+
         if (deleteResult.rowCount === 0) {
             return res.status(404).send('Joueur non trouvé');
         }
-    
+
         res.status(200).json({ message: `Joueur avec l'ID ${joueur_id} supprimé avec succès.` });
     } catch (err) {
         console.error(err);
